@@ -1,11 +1,14 @@
 from datetime import datetime
+from distutils.log import info
 import os
 import glob
 from pickle import FALSE
 import tkinter as tk
 
+version = "1.0"
+
 root = tk.Tk()
-root.title("M.A.R.S. Post-Post Processor")
+root.title("M.A.R.S. Post-Post Processor- v"+version)
 windWidth = 350
 windHeight = 150
 canvas1 = tk.Canvas(root, width = windWidth, height = windHeight)
@@ -16,25 +19,37 @@ def ProcessFiles():
     print("----------------------------")
     print("----------------------------")
     exePath = os.path.dirname(os.path.abspath(__file__))
-    #print(exePath)
-    cncFiles = glob.glob(exePath + '\In\*')
+    inFolder = exePath + '\In\\'
+    outFolder = exePath + '\Out\\'
+
+    # Check for in and out folder, create if they don't exist
+    if os.path.isdir(inFolder) == False:
+        os.mkdir(inFolder)
+    if os.path.isdir(outFolder) == False:
+        os.mkdir(outFolder)
+    
+    #Get current date/time
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%y %H:%M:%S")
-    spindleOn = False
-    unitsAreMetric = True
 
-    #Loop through all files in 'IN' folder
+    # Get list of files in the IN folder
+    cncFiles = glob.glob(inFolder + '*.txt')
+    # Loop through all files in 'IN' folder
     for cncFile in cncFiles:
         # Read all lines from processing file
         file = open(cncFile, "r")
         lines = file.readlines()
         file.close
 
-        #Create new file name, same as IN, but '.nc' type
+        # Define found code variables
+        spindleOn = False #Only stop for spindle at start of program
+        unitsAreMetric = True #Don't tell machine to go to -10in z postion. that would be bad
+        
+        # Create new file name, same as IN, but '.nc' type
         newFile = os.path.splitext(os.path.basename(cncFile))[0] + '.nc'
 
         # Open new file for write
-        file = open(exePath + '\OUT\\' +newFile, "w")
+        file = open(outFolder + newFile, "w")
         file.writelines("(Processed by M.A.R.S. " + dt_string + ")\n")
 
         #loop through all lines to write new file
@@ -51,7 +66,7 @@ def ProcessFiles():
             # If current line contains 'M30' write text before
             if line.find("M30") != -1:
                 # M30 is the end of program command
-                #Turn off spindle
+                # Turn off spindle
                 file.writelines("M05\n")
                 # Go to back of machine
                 if unitsAreMetric:
@@ -60,8 +75,8 @@ def ProcessFiles():
                 else:
                     file.writelines("G53 Z-0.6\n")
                     file.writelines("G53 Y-0.6\n")
-                #End if metric
-            #End find 'M30'
+                # End if metric
+            # End find 'M30'
 
             # If current line does not contain 'G28' write line
             if line.find("G28") == -1 & line.find("(THIS POST") == -1 & line.find("(WITHOUT") == -1:
@@ -78,23 +93,23 @@ def ProcessFiles():
                     file.writelines("(MAKE SURE THE SPINDLE IS RUNNING)\n")
                     file.writelines("(     THEN PRESS CYCLE START     )\n")
                     file.writelines("(--------------------------------)\n")
-                #End if SpindleON!True
-            #End if Find M03
+                # End if SpindleON!True
+            # End if Find M03
         
-        #Close new file
+        # Close new file
         file.close()
 
-        #Delete old file
+        # Delete old file
         os.remove(cncFile)
     
-    #Tell user files were converted
+    # Tell user files were converted
     lblTxt = 'Converted ' + str(len(cncFiles)) + ' file(s)'
     label1 = tk.Label(root, text= lblTxt, fg='green', font=('helvetica', 12, 'bold'))
     canvas1.create_window(windWidth/2, 100, window=label1)
 
-#Create button
+# Create button
 button1 = tk.Button(text='Process Files',command=ProcessFiles, bg='brown',fg='white', font=('helvetica',22,'bold'))
 canvas1.create_window(windWidth/2, 50, window=button1)
 
-#show GUI window
+# Show GUI window
 root.mainloop()
