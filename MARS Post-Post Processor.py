@@ -5,7 +5,7 @@ import glob
 from pickle import FALSE
 import tkinter as tk
 
-version = "1.1"
+version = "1.2"
 
 root = tk.Tk()
 root.title("M.A.R.S. Post-Post Processor- v"+version)
@@ -49,7 +49,8 @@ def ProcessFiles():
         unitsAreMetric = True #Don't tell machine to go to -10in z postion. that would be bad
         
         # Create new file name, same as IN, but '.nc' type
-        newFile = os.path.splitext(os.path.basename(cncFile))[0] + '.nc'
+        newFileName = os.path.splitext(os.path.basename(cncFile))[0]
+        newFile = newFileName + '.nc'
 
         # Open new file for write
         file = open(outFolder + newFile, "w")
@@ -105,6 +106,9 @@ def ProcessFiles():
 
         # Delete old file
         os.remove(cncFile)
+        if os.path.exists(inFolder + newFileName + ".set"):
+            os.remove(inFolder + newFileName + ".set")
+        
     # End files loop
 
     # Tell user files were converted
