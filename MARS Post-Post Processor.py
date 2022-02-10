@@ -5,7 +5,7 @@ import glob
 from pickle import FALSE
 import tkinter as tk
 
-version = "1.0"
+version = "1.1"
 
 root = tk.Tk()
 root.title("M.A.R.S. Post-Post Processor- v"+version)
@@ -15,18 +15,20 @@ canvas1 = tk.Canvas(root, width = windWidth, height = windHeight)
 
 canvas1.pack()
 
+exePath = os.getcwd()
+inFolder = exePath + '\In\\'
+outFolder = exePath + '\Out\\'
+
+# Check for in and out folder, create if they don't exist
+if os.path.exists(inFolder) == False:
+    os.mkdir(inFolder)
+if os.path.isdir(outFolder) == False:
+    os.mkdir(outFolder)
+
+
 def ProcessFiles():
     print("----------------------------")
     print("----------------------------")
-    exePath = os.path.dirname(os.path.abspath(__file__))
-    inFolder = exePath + '\In\\'
-    outFolder = exePath + '\Out\\'
-
-    # Check for in and out folder, create if they don't exist
-    if os.path.isdir(inFolder) == False:
-        os.mkdir(inFolder)
-    if os.path.isdir(outFolder) == False:
-        os.mkdir(outFolder)
     
     #Get current date/time
     now = datetime.now()
@@ -34,6 +36,7 @@ def ProcessFiles():
 
     # Get list of files in the IN folder
     cncFiles = glob.glob(inFolder + '*.txt')
+    
     # Loop through all files in 'IN' folder
     for cncFile in cncFiles:
         # Read all lines from processing file
@@ -95,18 +98,23 @@ def ProcessFiles():
                     file.writelines("(--------------------------------)\n")
                 # End if SpindleON!True
             # End if Find M03
-        
+        # End lines loop
+
         # Close new file
         file.close()
 
         # Delete old file
         os.remove(cncFile)
-    
+    # End files loop
+
     # Tell user files were converted
     lblTxt = 'Converted ' + str(len(cncFiles)) + ' file(s)'
     label1 = tk.Label(root, text= lblTxt, fg='green', font=('helvetica', 12, 'bold'))
     canvas1.create_window(windWidth/2, 100, window=label1)
 
+# Create Label
+label2 = tk.Label(root,text = exePath)
+canvas1.create_window(windWidth/2,10, window=label2)
 # Create button
 button1 = tk.Button(text='Process Files',command=ProcessFiles, bg='brown',fg='white', font=('helvetica',22,'bold'))
 canvas1.create_window(windWidth/2, 50, window=button1)
