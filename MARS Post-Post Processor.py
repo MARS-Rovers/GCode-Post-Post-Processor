@@ -55,6 +55,7 @@ def ProcessFiles():
         # Open new file for write
         file = open(outFolder + newFile, "w")
         file.writelines("(Processed by M.A.R.S. " + dt_string + ")\n")
+        lastLine = ""
 
         #loop through all lines to write new file
         for line in lines:
@@ -65,7 +66,6 @@ def ProcessFiles():
             if line.find("G20")!=-1:
                 # 'G20' specifies imperial unints, 'G21' specifies metric
                 unitsAreMetric = False
-
 
             # If current line contains 'M30' write text before
             if line.find("M30") != -1:
@@ -99,6 +99,7 @@ def ProcessFiles():
                     file.writelines("(--------------------------------)\n")
                 # End if SpindleON!True
             # End if Find M03
+            lastLine = line
         # End lines loop
 
         # Close new file
@@ -112,9 +113,9 @@ def ProcessFiles():
     # End files loop
 
     # Tell user files were converted
-    lblTxt = 'Converted ' + str(len(cncFiles)) + ' file(s)'
+    lblTxt = 'Converted ' + str(len(cncFiles)) + ' file(s)\n' + dt_string
     label1 = tk.Label(root, text= lblTxt, fg='green', font=('helvetica', 12, 'bold'))
-    canvas1.create_window(windWidth/2, 100, window=label1)
+    canvas1.create_window(windWidth/2, 110, window=label1)
 
 # Create Label
 label2 = tk.Label(root,text = exePath)
