@@ -5,7 +5,7 @@ import glob
 from pickle import FALSE
 import tkinter as tk
 
-version = "1.2"
+version = "1.3"
 
 root = tk.Tk()
 root.title("M.A.R.S. Post-Post Processor- v"+version)
